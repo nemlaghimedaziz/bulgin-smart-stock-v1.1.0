@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#181c24"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="SmartStock"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Bulgin Smart Stock</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#eef1f5;--surface:#fff;--surface2:#f4f6f9;
+  --border:#dde1e8;--border2:#b8bfcc;
+  --text:#181c24;--text2:#52596b;--text3:#98a0b3;
+  --green:#0f9e6e;--green-l:#e5f7f1;--green-d:#0a7050;
+  --red:#d94040;--red-l:#fceaea;
+  --blue:#1a56db;--blue-l:#ebf0ff;
+  --r:14px;--r2:9px;--r3:6px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+
+/* HEADER */
+.hdr{background:var(--text);padding:0 16px;padding-top:env(safe-area-inset-top);display:flex;align-items:center;gap:12px;height:calc(58px + env(safe-area-inset-top));position:sticky;top:0;z-index:20;flex-shrink:0}
+.logo{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-title{flex:1}
+.hdr-title h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.hdr-title p{font-size:11px;color:#6b7280;margin-top:1px}
+.hdr-date{font-size:11px;color:#6b7280;text-align:right;line-height:1.4;flex-shrink:0}
+
+/* INSTALL BANNER */
+.install-banner{background:linear-gradient(135deg,#0f9e6e,#0a7050);margin:12px 12px 0;border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;border:none;width:calc(100% - 24px);font-family:inherit}
+.install-banner:active{opacity:.9;transform:scale(.99)}
+.install-icon{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.install-icon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.install-text{flex:1;text-align:left}
+.install-text strong{display:block;font-size:13px;font-weight:700;color:#fff}
+.install-text span{font-size:11px;color:rgba(255,255,255,.75)}
+.install-arrow{color:rgba(255,255,255,.6);font-size:18px}
+
+/* CONTENT */
+.content{flex:1;padding:0 12px 100px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-top:14px;overflow:hidden}
+.card-hdr{padding:13px 15px 0;display:flex;align-items:center;justify-content:space-between}
+.card-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.card-body{padding:12px 15px 15px}
+
+/* CAMERA */
+.cam-wrap{border-radius:var(--r2);overflow:hidden;background:#0a0a0a;position:relative;margin-bottom:11px;aspect-ratio:4/3}
+.cam-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-ui{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.viewfinder{width:190px;height:190px;position:relative}
+.vf-corner{position:absolute;width:26px;height:26px;border-style:solid;border-color:var(--green)}
+.vf-corner.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:5px 0 0 0}
+.vf-corner.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 5px 0 0}
+.vf-corner.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 5px}
+.vf-corner.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 5px 0}
+.scan-beam{position:absolute;left:4%;width:92%;height:2.5px;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 8px var(--green);animation:beam 2s ease-in-out infinite}
+@keyframes beam{0%{top:10%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:90%;opacity:0}}
+.cam-hint{margin-top:14px;font-size:12px;color:rgba(255,255,255,.75);font-weight:500}
+.cam-off{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface2);border-radius:var(--r2);padding:28px 16px;text-align:center;border:1.5px dashed var(--border2);margin-bottom:11px;gap:10px}
+.cam-off svg{width:36px;height:36px;stroke:var(--text3);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.cam-off p{font-size:13px;color:var(--text2);font-weight:500}
+.cam-off small{font-size:12px;color:var(--text3)}
+
+/* SCAN FLASH */
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(15,158,110,.8)}100%{box-shadow:0 0 0 12px rgba(15,158,110,0)}}
+.cam-wrap.flashed{animation:flash .4s ease-out}
+
+/* BUTTONS */
+.btn{height:44px;border-radius:var(--r2);border:1.5px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 18px;transition:background .12s,transform .1s;font-family:inherit;width:100%}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:hover:not(:disabled){background:var(--surface2)}
+.btn.green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.green:hover:not(:disabled){background:var(--green-d)}
+.btn.red-outline{color:var(--red);border-color:var(--border);background:transparent}
+.btn.red-outline:hover:not(:disabled){background:var(--red-l);border-color:var(--red)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-row{display:flex;gap:8px}
+.btn-row .btn{flex:1}
+
+/* FIELDS */
+.fields{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.field{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);padding:11px 14px;transition:all .18s}
+.field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);display:block;margin-bottom:4px}
+.field .val{font-size:16px;font-weight:600;font-family:'SF Mono',SFMono-Regular,Consolas,monospace;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.field .val.empty{font-family:inherit;color:var(--text3);font-size:13px;font-weight:400}
+.field.filled{background:var(--green-l);border-color:#7dd9be}
+.field.filled label{color:var(--green-d)}
+.field.filled .val{color:var(--green-d)}
+
+/* STATUS */
+.status{font-size:12.5px;font-weight:500;padding:8px 12px;border-radius:var(--r2);margin-top:11px;display:none;text-align:center;line-height:1.45}
+.status.ok{display:block;background:var(--green-l);color:var(--green-d)}
+.status.err{display:block;background:var(--red-l);color:var(--red)}
+.status.info{display:block;background:var(--blue-l);color:var(--blue)}
+
+/* TABLE */
+.pill{font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;background:var(--green-l);color:var(--green-d);border:1px solid #7dd9be}
+.pill.grey{background:var(--surface2);color:var(--text3);border-color:var(--border)}
+.tbl-wrap{overflow-x:auto;border-top:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+thead th{background:var(--surface2);padding:8px 11px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover td{background:#fafbfc}
+tbody td{padding:9px 11px;color:var(--text);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.mono{font-family:'SF Mono',Consolas,monospace;font-size:12px}
+td.num{font-family:'SF Mono',Consolas,monospace;font-size:12px;text-align:right}
+td.idx{color:var(--text3);font-size:11px;width:26px}
+.del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:19px;line-height:1;padding:0 3px;border-radius:var(--r3);width:28px;text-align:center;font-family:inherit}
+.del:hover{color:var(--red);background:var(--red-l)}
+.empty-row{padding:30px 16px;text-align:center;color:var(--text3);font-size:13px;line-height:1.7;border-top:1px solid var(--border)}
+.empty-row b{display:block;color:var(--text2);font-size:14px;font-weight:600;margin-bottom:3px}
+
+/* FOOTER */
+footer{text-align:center;padding:22px 16px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--text3);line-height:1.7;flex-shrink:0}
+footer strong{color:var(--text2);font-weight:600}
+footer .dot{margin:0 5px;opacity:.4}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(70px);background:#181c24;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:26px;white-space:nowrap;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s;opacity:0;z-index:100;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="17" width="1" height="4"/><rect x="17" y="14" width="4" height="1"/><rect x="20" y="17" width="1" height="4"/><rect x="17" y="20" width="4" height="1"/></svg>
+  </div>
+  <div class="hdr-title">
+    <h1>Bulgin Smart Stock</h1>
+    <p>Warehouse scanning system</p>
+  </div>
+  <div class="hdr-date" id="hdr-date"></div>
+</header>
+
+<div class="content">
+
+  <!-- INSTALL BANNER (shown before installation) -->
+  <button class="install-banner" id="install-banner" style="display:none" onclick="installPWA()">
+    <div class="install-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L12 14M12 14L8 10M12 14L16 10"/><rect x="3" y="18" width="18" height="3" rx="1.5"/></svg>
+    </div>
+    <div class="install-text">
+      <strong>Install as App</strong>
+      <span>Tap to add to your home screen</span>
+    </div>
+    <span class="install-arrow">›</span>
+  </button>
+
+  <!-- SCAN CARD -->
+  <div class="card">
+    <div class="card-hdr"><span class="card-label">Scan carton</span></div>
+    <div class="card-body">
+
+      <div class="cam-wrap" id="cam-wrap" style="display:none">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="cam-ui">
+          <div class="viewfinder">
+            <div class="vf-corner tl"></div><div class="vf-corner tr"></div>
+            <div class="vf-corner bl"></div><div class="vf-corner br"></div>
+            <div class="scan-beam"></div>
+          </div>
+          <p class="cam-hint">Hold steady over the QR code</p>
+        </div>
+      </div>
+
+      <div class="cam-off" id="cam-off">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <p>Camera is off</p>
+        <small>Tap the button below to start scanning</small>
+      </div>
+
+      <button class="btn green" id="start-btn" onclick="startCamera()">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Start scanning
+      </button>
+      <button class="btn red-outline" id="stop-btn" onclick="stopCamera()" style="display:none;margin-top:9px">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        Stop camera
+      </button>
+
+      <!-- Fields: Order → Product → Qty -->
+      <div class="fields">
+        <div class="field" id="fw-order"><label>Order number</label><div class="val empty" id="fv-order">—</div></div>
+        <div class="field" id="fw-product"><label>Product ID</label><div class="val empty" id="fv-product">—</div></div>
+        <div class="field" id="fw-qty"><label>Quantity</label><div class="val empty" id="fv-qty">—</div></div>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn" id="discard-btn" disabled onclick="discardScan()" style="flex:0 0 44px;width:44px;padding:0;border-color:var(--border);color:var(--red);background:transparent" title="Discard scan">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+        <button class="btn green" id="add-btn" disabled onclick="addEntry()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add to sheet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET CARD -->
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-label">Stock sheet</span>
+      <span class="pill grey" id="count-pill">0 entries</span>
+    </div>
+    <div id="tbl-container">
+      <div class="empty-row"><b>No entries yet</b>Scan a carton QR code to start</div>
+    </div>
+    <div style="padding:12px 15px 15px">
+      <div class="btn-row">
+        <button class="btn green" id="export-btn" disabled onclick="exportExcel()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Excel
+        </button>
+        <button class="btn red-outline" onclick="clearAll()" style="flex:0 0 auto;width:auto;padding:0 18px">Clear</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<footer>
+  <strong>Bulgin Smart Stock</strong><span class="dot">•</span>Warehouse Scanning System<br>
+  Made by <strong>Nemlaghi Mohamed Aziz</strong>
+</footer>
+
+</div><!-- /app -->
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+// ── SERVICE WORKER ────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ── INSTALL PROMPT ────────────────────────────────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+  toast('App installed! ✓ Open from home screen');
+});
+function installPWA() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+}
+
+// ── DATE ──────────────────────────────────────────────────────────────────
+const now = new Date();
+document.getElementById('hdr-date').innerHTML =
+  now.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + '<br>' +
+  now.toLocaleDateString('en-GB',{weekday:'short'}).toUpperCase();
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let entries = [], parsed = null, camStream = null, scanning = false;
+
+// ── PARSER ────────────────────────────────────────────────────────────────
+// Format: 21<ProductID>]30<Qty>]10<OrderNo>-...
+function parseQR(raw) {
+  const s = raw.trim();
+  const segs = s.split(']').map(x => x.trim()).filter(Boolean);
+  if (segs.length < 3) return null;
+  const product   = segs[0].replace(/^\d{2}/, '').trim();
+  const qtyRaw    = segs[1].replace(/^\d{2}/, '').replace(/,/g, '').trim();
+  const qty       = parseFloat(qtyRaw);
+  const orderPart = segs[2].replace(/^\d{2}/, '');
+  const order     = ((orderPart.match(/^([^-]+)/) || [])[1] || '').trim();
+  if (!product && !qtyRaw && !order) return null;
+  return { order, product, qty: isNaN(qty) ? qtyRaw : qty.toString() };
+}
+
+// ── FIELDS ────────────────────────────────────────────────────────────────
+function showParsed(p) {
+  parsed = p;
+  const set = (fid, wid, v) => {
+    const f = document.getElementById(fid), w = document.getElementById(wid);
+    if (v) { f.textContent = v; f.className = 'val'; w.className = 'field filled'; }
+    else   { f.textContent = '—'; f.className = 'val empty'; w.className = 'field'; }
+  };
+  if (!p) {
+    set('fv-order','fw-order',''); set('fv-product','fw-product',''); set('fv-qty','fw-qty','');
+    setStatus('Could not read QR code — try again', 'err');
+    document.getElementById('add-btn').disabled = true;
+    document.getElementById('discard-btn').disabled = true;
+    return;
+  }
+  set('fv-order',   'fw-order',   p.order);
+  set('fv-product', 'fw-product', p.product);
+  set('fv-qty',     'fw-qty',     p.qty);
+  setStatus('QR read — tap "Add to sheet" to save', 'ok');
+  document.getElementById('add-btn').disabled = false;
+  document.getElementById('discard-btn').disabled = false;
+}
+
+function clearFields() {
+  parsed = null;
+  ['fv-order','fv-product','fv-qty'].forEach(id => { const e=document.getElementById(id); e.textContent='—'; e.className='val empty'; });
+  ['fw-order','fw-product','fw-qty'].forEach(id => { document.getElementById(id).className='field'; });
+  document.getElementById('add-btn').disabled = true;
+  document.getElementById('discard-btn').disabled = true;
+  document.getElementById('status').style.display = 'none';
+}
+
+function setStatus(msg, type) {
+  const e = document.getElementById('status'); e.textContent = msg; e.className = 'status ' + type;
+}
+
+// ── CAMERA ────────────────────────────────────────────────────────────────
+async function startCamera() {
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } }
+    });
+    document.getElementById('video').srcObject = camStream;
+    document.getElementById('cam-wrap').style.display = 'block';
+    document.getElementById('cam-off').style.display  = 'none';
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('stop-btn').style.display  = '';
+    scanning = true;
+    scanPaused = false;
+    lastScannedData = null;
+    setStatus('Scanning — hold the carton QR code steady…', 'info');
+    requestAnimationFrame(scanLoop);
+  } catch(e) {
+    setStatus('Camera access denied. Make sure you installed the app and opened it from your home screen.', 'err');
+  }
+}
+
+function stopCamera() {
+  scanning = false;
+  scanPaused = false;
+  lastScannedData = null;
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  document.getElementById('cam-wrap').style.display  = 'none';
+  document.getElementById('cam-off').style.display   = 'block';
+  document.getElementById('start-btn').style.display = '';
+  document.getElementById('stop-btn').style.display  = 'none';
+}
+
+let scanPaused = false;
+let lastScannedData = null;
+
+function scanLoop() {
+  if (!scanning) return;
+  if (scanPaused) { requestAnimationFrame(scanLoop); return; }
+  const v = document.getElementById('video');
+  if (v.readyState === v.HAVE_ENOUGH_DATA && typeof jsQR !== 'undefined') {
+    const c = document.createElement('canvas');
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    const ctx = c.getContext('2d'); ctx.drawImage(v, 0, 0);
+    const code = jsQR(ctx.getImageData(0,0,c.width,c.height).data, c.width, c.height, {inversionAttempts:'dontInvert'});
+    if (code && code.data && code.data !== lastScannedData) {
+      lastScannedData = code.data;
+      const wrap = document.getElementById('cam-wrap');
+      wrap.classList.add('flashed');
+      setTimeout(() => wrap.classList.remove('flashed'), 400);
+      showParsed(parseQR(code.data));
+      toast('✓ QR code scanned');
+      scanPaused = true;
+    }
+  }
+  requestAnimationFrame(scanLoop);
+}
+
+async function recycleCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  const v = document.getElementById('video');
+  v.srcObject = null;
+  await new Promise(r => setTimeout(r, 600));
+  if (!scanning) return;
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } }
+    });
+    v.srcObject = camStream;
+    await new Promise(r => { v.onloadedmetadata = r; });
+    v.play();
+    await new Promise(r => setTimeout(r, 800));
+    if (!scanning) return;
+    lastScannedData = null;
+    scanPaused = false;
+    setStatus('Scanning — hold the carton QR code steady…', 'info');
+  } catch(e) {
+    setStatus('Camera error — tap Stop then Start to retry.', 'err');
+    stopCamera();
+  }
+}
+
+// ── ADD ───────────────────────────────────────────────────────────────────
+function addEntry() {
+  if (!parsed) return;
+  entries.push({ ...parsed, time: new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) });
+  renderTable(); clearFields();
+  resumeScan();
+  toast('Added to sheet ✓');
+}
+
+function discardScan() {
+  clearFields();
+  resumeScan();
+  toast('Scan discarded');
+}
+
+function resumeScan() {
+  if (!scanning) return;
+  lastScannedData = null;
+  scanPaused = false;
+  setStatus('Scanning — hold the carton QR code steady…', 'info');
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────
+function renderTable() {
+  const pill = document.getElementById('count-pill');
+  pill.textContent = entries.length + (entries.length===1?' entry':' entries');
+  pill.className = entries.length ? 'pill' : 'pill grey';
+  document.getElementById('export-btn').disabled = !entries.length;
+  const con = document.getElementById('tbl-container');
+  if (!entries.length) { con.innerHTML='<div class="empty-row"><b>No entries yet</b>Scan a carton QR code to start</div>'; return; }
+  const sorted = entries.map((e,i)=>({...e,_i:i})).sort((a,b)=>String(a.order).localeCompare(String(b.order),undefined,{numeric:true}));
+  con.innerHTML=`<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th style="width:26px">#</th>
+      <th style="width:28%">Order No.</th>
+      <th style="width:32%">Product ID</th>
+      <th style="width:20%;text-align:right">Qty</th>
+      <th style="width:26px"></th>
+    </tr></thead>
+    <tbody>${sorted.map((e,i)=>`<tr>
+      <td class="idx">${i+1}</td>
+      <td class="mono">${esc(e.order)}</td>
+      <td class="mono">${esc(e.product)}</td>
+      <td class="num">${esc(e.qty)}</td>
+      <td><button class="del" onclick="delEntry(${e._i})">×</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+window.delEntry = i => { entries.splice(i,1); renderTable(); toast('Entry removed'); };
+
+function clearAll() {
+  if (!entries.length) return;
+  if (confirm('Clear all '+entries.length+' entries? This cannot be undone.')) { entries=[]; renderTable(); toast('Sheet cleared'); }
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+function exportExcel() {
+  if (!entries.length) return;
+  if (typeof XLSX==='undefined') { alert('Excel library not loaded yet. Check your connection and try again.'); return; }
+  const today=new Date();
+  const ds=today.toLocaleDateString('en-GB').replace(/\//g,'-');
+  const dl=today.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const rows=[
+    ['Bulgin Smart Stock — '+dl],['Warehouse Scanning System'],[],
+    ['#','Order Number','Product ID','Quantity','Time'],
+    ...entries.map((e,i)=>[i+1,e.order,e.product,parseFloat(e.qty)||e.qty,e.time]),
+    [],['',' ','Total entries',entries.length,''],
+    [],['','','','','Made by Nemlaghi Mohamed Aziz']
+  ];
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:4},{wch:16},{wch:18},{wch:13},{wch:10}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}},{s:{r:1,c:0},e:{r:1,c:4}}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Stock '+ds);
+  XLSX.writeFile(wb,'BulginSmartStock_'+ds+'.xlsx');
+  toast('Exported ✓');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+renderTable();
+</script>
+</body>
+</html>
